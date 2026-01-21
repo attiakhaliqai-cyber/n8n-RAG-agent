@@ -1,0 +1,301 @@
+{
+  "name": "Homeschool RAG Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        48
+      ],
+      "id": "e9054a98-11e1-4037-a53d-0a9efbbb6286",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "13xsEu32pOYuA31Q3qHc_ZOkkSmmrvOXa",
+          "mode": "list",
+          "cachedResultName": "Homeschool_Detailed_Knowledge_Ages_4_to_7.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/13xsEu32pOYuA31Q3qHc_ZOkkSmmrvOXa/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        48
+      ],
+      "id": "c625750d-a8a8-4c65-a08a-c771667ae0a7",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "EBOuHsDEnUC0BcSo",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        48
+      ],
+      "id": "ed8bcb65-3c6b-4512-a62a-00037da9f8fa",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "W1sPMawWj9hFTmXn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        272
+      ],
+      "id": "b54e2f77-94b3-4eff-8212-a6e8e238ef78",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        288
+      ],
+      "id": "4a24a0cb-b6de-47f3-ab0e-cc5f4773edb3",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IBugYqynpmBEb3jr",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -672,
+        -240
+      ],
+      "id": "3122e40f-ced0-4519-823a-da5d98e15b77",
+      "name": "When chat message received",
+      "webhookId": "a498c85d-b9dd-45df-b363-516b1a9082c7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Homeschool Assistant AI designed to help parents of early learners aged 4 to 7.\n\nYour role:\n- Create daily lesson plans\n- Explain concepts in very simple, child-friendly language\n- Support homeschooling parents with practical guidance\n\nRules:\n- Always keep explanations short, simple, and age-appropriate\n- Use everyday examples (toys, fruits, home objects)\n- Avoid technical or academic language\n- Break answers into small steps\n- If the child’s age is not mentioned, ask politely for the age\n- Use the provided knowledge base only; do not invent facts\n- If information is not available, say “I don’t have enough information”\n\nTone:\n- Calm, encouraging, and supportive\n- Speak like a caring homeschool teacher, not a textbook\n\nOutput format:\n- Use headings\n- Use bullet points\n- Keep responses easy to read for parents\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -464,
+        -240
+      ],
+      "id": "1d63ee63-d962-4da9-93b0-83493302182a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -32
+      ],
+      "id": "2c3be5a3-70ef-4ecb-8f6f-6e13e70555f2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IBugYqynpmBEb3jr",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve answers for query from chat input",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        -240
+      ],
+      "id": "52d11319-122f-44d6-b49f-277aeb71b58e",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "W1sPMawWj9hFTmXn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "b118784f-94f4-49d4-a942-97a1f1a6b299",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "1FmJ3vZCtuFbO5Eu",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e1eb29f4-4723-47cc-aac0-13be5b010bdb",
+  "meta": {
+    "instanceId": "d26818b925b21fb9e4e80c219b9a1c6c49c45f6a06f26d57ca0fa616d6d98ae6"
+  },
+  "id": "UcDPFr70QU1AQbKVCZ9DJ",
+  "tags": []
+}
